@@ -1,0 +1,118 @@
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play Cell</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.css" rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/theme/neo.css' rel='stylesheet'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jsonlint/1.6.0/jsonlint.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/addon/lint/lint.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/addon/lint/javascript-lint.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/addon/lint/json-lint.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/addon/edit/closebrackets.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/addon/edit/matchbrackets.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/javascript/javascript.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.css" rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/theme/neo.css' rel='stylesheet'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/mode/javascript/javascript.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+<script src="https://www.celljs.org/cell.js"></script>
+<style>
+html,body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+}
+body: {
+  display: flex;
+  flex-direction: column;
+}
+body > .layout {
+  width: 100%;
+  height: 100%;
+}
+.layout {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+.horizontal {
+  height: 100%;
+  flex-direction: row;
+}
+.vertical {
+  width: 100%;
+  flex-direction: column;
+}
+.layout > :not([style*="display: none"]) {
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+#frame{
+  border-left: 1px solid whitesmoke;
+}
+</style>
+<script>
+var playground = {
+  $cell: true,
+  class: "horizontal layout",
+  _updateFrame: _.debounce(function(html){
+    this.querySelector("#frame")._update(html)
+  }, 300),
+  $components: [
+    {
+      $type: "textarea",
+      id: "writer",
+      value: "\<html\>\n\<script src='https://www.celljs.org/cell.js'\>\<\/script\>\n\<script\>\n\nಠᴥಠ = {\n  $cell: true,\n  $type: 'h1',\n  $text: 'Hello world'\n}\n\n\<\/script\>\n\<\/html\>",
+      _ed: null,
+      _changed: function(){
+        var val = this._ed.getValue();
+        this._updateFrame(val);
+      },
+      $init: function(){
+        this._ed = CodeMirror.fromTextArea(this, {
+          mode: "application/json", lineNumbers: true, lineWrapping: true, lint: true, styleActiveLine: true, autoCloseBrackets: true, matchBrackets: true, viewportMargin: true, theme: "neo", gutters: ["CodeMirror-lint-markers"]
+        })
+        try{
+          this._ed.on("change", function(e){
+            this._changed();
+          }.bind(this))
+        } catch (e) {}
+        if(this._focused) this._ed.focus()
+        this._changed();
+      }
+    },
+    {
+      $type: "iframe",
+      id: "frame",
+      _update: function(o){
+        this.contentWindow.document.open('text/html', 'replace');
+        this.contentWindow.document.write(o);
+        this.contentWindow.document.close()
+      }
+    }
+  ]
+}
+ForkMeOnGithub = {
+  $cell: true,
+  $type: "a",
+  href: "https://github.com/you",
+  $components: [{
+    $type: "img",
+    style: "position: absolute; top: 0; right: 0; border: 0;",
+    src: "https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67",
+    alt: "Fork me on GitHub",
+    "data-canonical-src": "https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+  }]
+}
+</script>
+</html>
