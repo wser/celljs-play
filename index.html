@@ -60,6 +60,13 @@ body > .layout {
 #frame{
   border-left: 1px solid whitesmoke;
 }
+#controls{
+  position: absolute;
+  bottom:0;
+  right:0;
+  left:0;
+  margin: 20px;
+}
 </style>
 <script>
 var playground = {
@@ -77,6 +84,7 @@ var playground = {
       _changed: function(){
         var val = this._ed.getValue();
         this._updateFrame(val);
+        document.querySelector("#share")._updateHref(val);
       },
       $init: function(){
         this._ed = CodeMirror.fromTextArea(this, {
@@ -95,6 +103,12 @@ var playground = {
       $type: "iframe",
       id: "frame",
       _update: function(o){
+        // Clean up all global variables in the iframe first
+        Object.keys(this.contentWindow).filter(function(key){
+          return Object.keys(window).indexOf(key) === -1;
+        }).forEach(function(key){
+          delete this.contentWindow[key];
+        }.bind(this))
         this.contentWindow.document.open('text/html', 'replace');
         this.contentWindow.document.write(o);
         this.contentWindow.document.close()
@@ -114,5 +128,29 @@ ForkMeOnGithub = {
     "data-canonical-src": "https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
   }]
 }
+var controls = {
+  $cell: true,
+  id: "controls",
+  $components: [
+    {
+      $type: "span",
+      style: "padding: 5px 10px; font-size: 14px; font-family: HelveticaNeue, helvetica, arial; display: inline-block; background: rgba(0,0,0,0.8); color: white; font-weight: bold;",
+      $text: "Share This App (Try copy and pasting this URL in the address bar)"
+    },
+    {
+      $type: "input",
+      id: "share",
+      value: "",
+      style: "padding: 5px; font-size: 16px; width: 100%; border: 2px solid rgba(0,0,0,0.8); color: rgba(0,0,0,0.8);",
+      _updateHref: function(html){
+        html = html.replace("<html>", "");
+        html = html.replace("</html>", "");
+        var dataURI = 'data:text/html;charset=UTF-8,' + encodeURIComponent(html);
+        this.value = dataURI;
+      }
+    }
+  ]
+}
+
 </script>
 </html>
