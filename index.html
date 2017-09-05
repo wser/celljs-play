@@ -80,7 +80,6 @@ var playground = {
       _changed: function(){
         var val = this._ed.getValue();
         this._updateFrame(val);
-        document.querySelector("#share")._updateHref(val);
       },
       $init: function(){
         this._ed = CodeMirror.fromTextArea(this, {
